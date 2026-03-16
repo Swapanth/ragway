@@ -7,7 +7,7 @@ import { useState, useCallback, useEffect } from 'react'
 ───────────────────────────────────────── */
 
 const YAML_EXAMPLES = {
-    groq: `version: "1.0"
+  groq: `version: "1.0"
 pipeline: hybrid
 
 plugins:
@@ -32,7 +32,7 @@ plugins:
     strategy: recursive
     chunk_size: 512`,
 
-    anthropic: `version: "1.0"
+  anthropic: `version: "1.0"
 pipeline: naive
 
 plugins:
@@ -60,7 +60,7 @@ plugins:
     strategy: semantic
     chunk_size: 512`,
 
-    local: `version: "1.0"
+  local: `version: "1.0"
 pipeline: naive
 
 plugins:
@@ -85,63 +85,63 @@ plugins:
 }
 
 const REGISTRY_CATEGORIES = [
-    { cat: 'pipeline', label: 'Pipeline', items: ['naive', 'hybrid', 'self', 'long_context', 'agentic'], default: 'naive' },
-    { cat: 'llm', label: 'LLM provider', items: ['anthropic', 'openai', 'mistral', 'groq', 'llama', 'local'], default: 'groq' },
-    { cat: 'embedding', label: 'Embedding', items: ['bge', 'openai', 'cohere', 'sentence_transformer'], default: 'bge' },
-    { cat: 'vectorstore', label: 'Vectorstore', items: ['faiss', 'qdrant', 'chroma', 'pinecone', 'weaviate', 'pgvector'], default: 'faiss' },
-    { cat: 'retrieval', label: 'Retrieval', items: ['vector', 'hybrid', 'bm25', 'multi_query', 'parent_document'], default: 'vector' },
-    { cat: 'reranker', label: 'Reranker', items: ['none', 'bge', 'cohere', 'cross_encoder'], default: 'none' },
-    { cat: 'chunking', label: 'Chunking', items: ['recursive', 'fixed', 'semantic', 'sliding_window', 'hierarchical'], default: 'recursive' },
+  { cat: 'pipeline', label: 'Pipeline', items: ['naive', 'hybrid', 'self', 'long_context', 'agentic'], default: 'naive' },
+  { cat: 'llm', label: 'LLM provider', items: ['anthropic', 'openai', 'mistral', 'groq', 'llama', 'local'], default: 'groq' },
+  { cat: 'embedding', label: 'Embedding', items: ['bge', 'openai', 'cohere', 'sentence_transformer'], default: 'bge' },
+  { cat: 'vectorstore', label: 'Vectorstore', items: ['faiss', 'qdrant', 'chroma', 'pinecone', 'weaviate', 'pgvector'], default: 'faiss' },
+  { cat: 'retrieval', label: 'Retrieval', items: ['vector', 'hybrid', 'bm25', 'multi_query', 'parent_document'], default: 'vector' },
+  { cat: 'reranker', label: 'Reranker', items: ['none', 'bge', 'cohere', 'cross_encoder'], default: 'none' },
+  { cat: 'chunking', label: 'Chunking', items: ['recursive', 'fixed', 'semantic', 'sliding_window', 'hierarchical'], default: 'recursive' },
 ] as const
 
 type CatKey = typeof REGISTRY_CATEGORIES[number]['cat']
 type Selections = Record<CatKey, string>
 
 const LLM_MODELS: Record<string, string> = {
-    anthropic: 'claude-sonnet-4-6', openai: 'gpt-4o',
-    mistral: 'mistral-large-latest', groq: 'llama-3.3-70b-versatile',
-    llama: 'llama-3.1-8b-instruct', local: 'local-default-model',
+  anthropic: 'claude-sonnet-4-6', openai: 'gpt-4o',
+  mistral: 'mistral-large-latest', groq: 'llama-3.3-70b-versatile',
+  llama: 'llama-3.1-8b-instruct', local: 'local-default-model',
 }
 const EMB_MODELS: Record<string, string> = {
-    openai: 'text-embedding-3-small', bge: 'BAAI/bge-large-en-v1.5',
-    cohere: 'embed-english-v3.0', sentence_transformer: 'all-MiniLM-L6-v2',
+  openai: 'text-embedding-3-small', bge: 'BAAI/bge-large-en-v1.5',
+  cohere: 'embed-english-v3.0', sentence_transformer: 'all-MiniLM-L6-v2',
 }
 const NEEDS_KEY: Record<string, string[]> = {
-    llm: ['anthropic', 'openai', 'mistral', 'groq'],
-    embedding: ['openai', 'cohere'],
-    vectorstore: ['pinecone', 'weaviate'],
-    reranker: ['cohere'],
+  llm: ['anthropic', 'openai', 'mistral', 'groq'],
+  embedding: ['openai', 'cohere'],
+  vectorstore: ['pinecone', 'weaviate'],
+  reranker: ['cohere'],
 }
 
 function buildYaml(s: Selections): string {
-    const llmKey = NEEDS_KEY.llm.includes(s.llm)
-        ? `\n    api_key: \${${s.llm.toUpperCase()}_API_KEY}`
-        : s.llm === 'llama' ? '\n    model_path: ./models/llama-3.1-8b.gguf' : ''
-    const embKey = NEEDS_KEY.embedding.includes(s.embedding)
-        ? `\n    api_key: \${${s.embedding.toUpperCase()}_API_KEY}` : ''
-    const vsKey = NEEDS_KEY.vectorstore.includes(s.vectorstore)
-        ? `\n    api_key: \${${s.vectorstore.toUpperCase()}_API_KEY}` : ''
-    const vsExtra =
-        ['faiss', 'chroma', 'qdrant'].includes(s.vectorstore) ? '\n    index_path: .ragway/index' :
-            s.vectorstore === 'pinecone' ? '\n    index_name: my-project' :
-                s.vectorstore === 'pgvector' ? '\n    connection: ${PGVECTOR_CONNECTION_STRING}' :
-                    s.vectorstore === 'weaviate' ? '\n    url: ${WEAVIATE_URL}' : ''
-    const rerankerBlock = s.reranker === 'none'
-        ? `  reranker:\n    enabled: false`
-        : `  reranker:\n    enabled: true\n    provider: ${s.reranker}${NEEDS_KEY.reranker.includes(s.reranker)
-            ? `\n    api_key: \${${s.reranker.toUpperCase()}_API_KEY}` : ''
-        }\n    top_k: 3`
-    const hybridExtra = s.retrieval === 'hybrid' ? '\n    hybrid_alpha: 0.5' : ''
+  const llmKey = NEEDS_KEY.llm.includes(s.llm)
+    ? `\n    api_key: \${${s.llm.toUpperCase()}_API_KEY}`
+    : s.llm === 'llama' ? '\n    model_path: ./models/llama-3.1-8b.gguf' : ''
+  const embKey = NEEDS_KEY.embedding.includes(s.embedding)
+    ? `\n    api_key: \${${s.embedding.toUpperCase()}_API_KEY}` : ''
+  const vsKey = NEEDS_KEY.vectorstore.includes(s.vectorstore)
+    ? `\n    api_key: \${${s.vectorstore.toUpperCase()}_API_KEY}` : ''
+  const vsExtra =
+    ['faiss', 'chroma', 'qdrant'].includes(s.vectorstore) ? '\n    index_path: .ragway/index' :
+      s.vectorstore === 'pinecone' ? '\n    index_name: my-project' :
+        s.vectorstore === 'pgvector' ? '\n    connection: ${PGVECTOR_CONNECTION_STRING}' :
+          s.vectorstore === 'weaviate' ? '\n    url: ${WEAVIATE_URL}' : ''
+  const rerankerBlock = s.reranker === 'none'
+    ? `  reranker:\n    enabled: false`
+    : `  reranker:\n    enabled: true\n    provider: ${s.reranker}${NEEDS_KEY.reranker.includes(s.reranker)
+      ? `\n    api_key: \${${s.reranker.toUpperCase()}_API_KEY}` : ''
+    }\n    top_k: 3`
+  const hybridExtra = s.retrieval === 'hybrid' ? '\n    hybrid_alpha: 0.5' : ''
 
-    return `version: "1.0"\npipeline: ${s.pipeline}\n\nplugins:\n  llm:\n    provider: ${s.llm}\n    model: ${LLM_MODELS[s.llm] ?? s.llm}${llmKey}\n    temperature: 0.2\n    max_tokens: 1024\n\n  embedding:\n    provider: ${s.embedding}\n    model: ${EMB_MODELS[s.embedding] ?? s.embedding}${embKey}\n    batch_size: 32\n\n  vectorstore:\n    provider: ${s.vectorstore}${vsExtra}${vsKey}\n\n  retrieval:\n    strategy: ${s.retrieval}\n    top_k: 5${hybridExtra}\n\n  ${rerankerBlock}\n\n  chunking:\n    strategy: ${s.chunking}\n    chunk_size: 512\n    overlap: 50`
+  return `version: "1.0"\npipeline: ${s.pipeline}\n\nplugins:\n  llm:\n    provider: ${s.llm}\n    model: ${LLM_MODELS[s.llm] ?? s.llm}${llmKey}\n    temperature: 0.2\n    max_tokens: 1024\n\n  embedding:\n    provider: ${s.embedding}\n    model: ${EMB_MODELS[s.embedding] ?? s.embedding}${embKey}\n    batch_size: 32\n\n  vectorstore:\n    provider: ${s.vectorstore}${vsExtra}${vsKey}\n\n  retrieval:\n    strategy: ${s.retrieval}\n    top_k: 5${hybridExtra}\n\n  ${rerankerBlock}\n\n  chunking:\n    strategy: ${s.chunking}\n    chunk_size: 512\n    overlap: 50`
 }
 
 const FAQS = [
-    { q: 'How is ragway different from LangChain?', a: 'ragway is RAG-only and config-driven. Swap any component — LLM, vectorstore, reranker — with one YAML line. No Python code changes needed. LangChain is a general framework; ragway is focused entirely on RAG and is far easier to configure and debug.' },
-    { q: 'Do I need all providers installed?', a: 'No. ragway uses optional dependencies. pip install ragway[groq,faiss] installs only what you need. Each provider is completely independent.' },
-    { q: 'Can I use ragway without any API keys?', a: 'Yes. Use the fully_local config: Llama for LLM, BGE for embeddings and reranking, FAISS for vectorstore. Everything runs on your machine — zero cost, zero keys.' },
-    { q: 'Can I switch providers without re-ingesting?', a: 'You can switch the LLM and reranker without re-ingesting. Switching vectorstore or embedding model requires re-ingesting because vector representations change.' },
-    { q: 'What document types can ragway ingest?', a: 'PDF, Markdown, DOCX, Excel, HTML, plain text, URLs, YouTube transcripts, and Notion pages.' },
+  { q: 'How is ragway different from LangChain?', a: 'ragway is RAG-only and config-driven. Swap any component — LLM, vectorstore, reranker — with one YAML line. No Python code changes needed. LangChain is a general framework; ragway is focused entirely on RAG and is far easier to configure and debug.' },
+  { q: 'Do I need all providers installed?', a: 'No. ragway uses optional dependencies. pip install ragway[groq,faiss] installs only what you need. Each provider is completely independent.' },
+  { q: 'Can I use ragway without any API keys?', a: 'Yes. Use the fully_local config: Llama for LLM, BGE for embeddings and reranking, FAISS for vectorstore. Everything runs on your machine — zero cost, zero keys.' },
+  { q: 'Can I switch providers without re-ingesting?', a: 'You can switch the LLM and reranker without re-ingesting. Switching vectorstore or embedding model requires re-ingesting because vector representations change.' },
+  { q: 'What document types can ragway ingest?', a: 'PDF, Markdown, DOCX, Excel, HTML, plain text, URLs, YouTube transcripts, and Notion pages.' },
 ]
 
 const CODE_HTML = `<span class="tok-kw">from</span> ragway <span class="tok-kw">import</span> <span class="tok-cls">RAG</span>
@@ -174,10 +174,10 @@ asyncio.<span class="tok-fn">run</span>(<span class="tok-fn">main</span>())<span
 ───────────────────────────────────────── */
 
 export default function Home() {
-    const [activeYaml, setActiveYaml] = useState<keyof typeof YAML_EXAMPLES>('groq')
-    const [openFaq, setOpenFaq] = useState<number | null>(null)
-    const [isDark, setIsDark] = useState(true)
-    const themeClass = isDark ? 'dark-mode' : 'light-mode'
+  const [activeYaml, setActiveYaml] = useState<keyof typeof YAML_EXAMPLES>('groq')
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [isDark, setIsDark] = useState(true)
+  const themeClass = isDark ? 'dark-mode' : 'light-mode'
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -205,39 +205,39 @@ export default function Home() {
     })
   }, [])
 
-    const defaultSel = Object.fromEntries(
-        REGISTRY_CATEGORIES.map(c => [c.cat, c.default])
-    ) as Selections
-    const [selections, setSelections] = useState<Selections>(defaultSel)
+  const defaultSel = Object.fromEntries(
+    REGISTRY_CATEGORIES.map(c => [c.cat, c.default])
+  ) as Selections
+  const [selections, setSelections] = useState<Selections>(defaultSel)
 
-    const select = useCallback((cat: CatKey, val: string) => {
-        setSelections(prev => ({ ...prev, [cat]: val }))
-    }, [])
+  const select = useCallback((cat: CatKey, val: string) => {
+    setSelections(prev => ({ ...prev, [cat]: val }))
+  }, [])
 
-    const yaml = buildYaml(selections)
+  const yaml = buildYaml(selections)
 
-    const downloadYaml = useCallback(() => {
-        const blob = new Blob([yaml], { type: 'text/yaml' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'rag.yaml'
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-    }, [yaml])
+  const downloadYaml = useCallback(() => {
+    const blob = new Blob([yaml], { type: 'text/yaml' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'rag.yaml'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, [yaml])
 
-    return (
-        <>
-            <Head>
-                <title>ragway — The way to build RAG</title>
-                <meta name="description" content="Modular RAG library. Swap any component via YAML config." />
-                <link rel="icon" href="/favicon.ico" />
-                <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
-            </Head>
+  return (
+    <>
+      <Head>
+        <title>ragway — The way to build RAG</title>
+        <meta name="description" content="Modular RAG library. Swap any component via YAML config." />
+        <link rel="icon" href="/favicon.ico" />
+        <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+      </Head>
 
-            <style jsx global>{`
+      <style jsx global>{`
         /* ── variables ── */
         :root {
           --accent:        #38b6ff;
@@ -649,192 +649,193 @@ export default function Home() {
         .footer-links a:hover { color: var(--accent); }
       `}</style>
 
-            <div className={`page-shell ${themeClass}`}>
-                {/* ── HEADER ── */}
-                <header className="header">
-                    <div className="header-logo">ragway</div>
-                    <nav className="header-nav">
-                        <Link href="/docs">docs</Link>
-                        <Link href="/docs/quickstart">quickstart</Link>
-                        <a href="https://pypi.org/project/ragway/" target="_blank" rel="noreferrer">pypi</a>
-                        <a href="https://github.com/yourusername/ragway" target="_blank" rel="noreferrer" className="gh-btn">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-                            </svg>
-                            GitHub
-                        </a>
-                        {/* ── LIGHT / DARK TOGGLE ── */}
-                        <button className="theme-btn" onClick={toggleTheme} aria-label="Toggle theme">
-                            {isDark
-                                ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></svg>
-                                : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
-                            }
-                        </button>
-                    </nav>
-                </header>
+      <div className={`page-shell ${themeClass}`}>
+        {/* ── HEADER ── */}
+        <header className="header">
+          <div className="header-logo">ragway</div>
+          <nav className="header-nav">
+            <Link href="/docs">docs</Link>
+            <Link href="/docs/quickstart">quickstart</Link>
+            <a href="https://pypi.org/project/ragway/" target="_blank" rel="noreferrer">pypi</a>
+            <a href="https://github.com/yourusername/ragway" target="_blank" rel="noreferrer" className="gh-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+              </svg>
+              GitHub
+            </a>
+            {/* ── LIGHT / DARK TOGGLE ── */}
+            <button className="theme-btn" onClick={toggleTheme} aria-label="Toggle theme">
+              {isDark
+                ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></svg>
+                : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+              }
+            </button>
+          </nav>
+        </header>
 
-                {/* ── MAIN ── */}
+        {/* ── MAIN ── */}
 
-                {/* ── HERO ── */}
-                <div className="hero-wrap">
-                    <div className="container">
-                        <div className="hero-grid">
+        {/* ── HERO ── */}
+        <div className="hero-wrap">
+          <div className="container">
+            <div className="hero-grid">
 
-                            {/* left */}
-                            <div>
-                                <div className="hero-pill">
-                                    <div className="pill-dot" />
-                                    v0.1.0 — now on PyPI
-                                </div>
-                                <h1 className="hero-h1">
-                                    The way to<br />
-                                    <span>build RAG</span>
-                                </h1>
-                                <p className="hero-p">
-                                    Modular RAG library for Python. Swap any component — LLM,
-                                    vectorstore, reranker — with one line in a YAML file.
-                                    No code changes. Just config.
-                                </p>
-                                <div className="hero-actions">
-                                    <Link href="/docs/quickstart" className="btn-primary">Get started →</Link>
-                                    <Link href="/docs" className="btn-secondary">Documentation</Link>
-                                </div>
-                                <div className="hero-install">
-                                    <span>install</span>
-                                    <code>pip install ragway</code>
-                                </div>
-                            </div>
-
-                            {/* right — code editor */}
-                            <div className="code-editor">
-                                <div className="editor-header">
-                                    <div className="editor-dot" style={{ background: '#ff5f57' }} />
-                                    <div className="editor-dot" style={{ background: '#febc2e' }} />
-                                    <div className="editor-dot" style={{ background: '#28c840' }} />
-                                    <span className="editor-file">quickstart.py</span>
-                                </div>
-                                <div className="editor-body">
-                                    <pre dangerouslySetInnerHTML={{ __html: CODE_HTML }} />
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
+              {/* left */}
+              <div>
+                <div className="hero-pill">
+                  <div className="pill-dot" />
+                  v0.1.0 — now on PyPI
                 </div>
-
-                {/* ── HOW TO USE ── */}
-                <div className="container">
-                    <div className="section">
-                        <div className="section-eyebrow">how it works</div>
-                        <h2 className="section-h2">One YAML file.<br />Everything configured.</h2>
-                        <p className="section-lead">
-                            Pick a provider for each component. Add your API key.
-                            ragway wires it all together — no Python changes needed.
-                        </p>
-                        <div className="yaml-tabs">
-                            {(Object.keys(YAML_EXAMPLES) as Array<keyof typeof YAML_EXAMPLES>).map(k => (
-                                <button
-                                    key={k}
-                                    className={`yaml-tab${activeYaml === k ? ' active' : ''}`}
-                                    onClick={() => setActiveYaml(k)}
-                                >
-                                    {k === 'groq' ? 'groq + qdrant' : k === 'anthropic' ? 'anthropic + pinecone' : 'fully local'}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="yaml-block">
-                            <pre>{YAML_EXAMPLES[activeYaml]}</pre>
-                        </div>
-                    </div>
+                <h1 className="hero-h1">
+                  The way to<br />
+                  <span>build RAG</span>
+                </h1>
+                <p className="hero-p">
+                  Modular RAG library for Python. Swap any component — LLM,
+                  vectorstore, reranker — with one line in a YAML file.
+                  No code changes. Just config.
+                </p>
+                <div className="hero-actions">
+                  <Link href="/docs/quickstart" className="btn-primary">Get started →</Link>
+                  <Link href="/docs" className="btn-secondary">Documentation</Link>
                 </div>
-
-                {/* ── CONFIG BUILDER ── */}
-                <div className="container">
-                    <div className="section">
-                        <div className="section-eyebrow">config builder</div>
-                        <h2 className="section-h2">Build your rag.yaml</h2>
-                        <p className="section-lead">
-                            Select one from each category. Your config generates live.
-                            Download and drop it straight into your project.
-                        </p>
-                        <div className="builder-grid">
-
-                            {/* left — chips */}
-                            <div>
-                                {REGISTRY_CATEGORIES.map(({ cat, label, items }) => (
-                                    <div className="builder-category" key={cat}>
-                                        <div className="builder-cat-label">{label}</div>
-                                        <div className="builder-chips">
-                                            {items.map(item => (
-                                                <button
-                                                    key={item}
-                                                    className={`builder-chip${selections[cat] === item ? ' selected' : ''}`}
-                                                    onClick={() => select(cat as CatKey, item)}
-                                                >
-                                                    {item}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* right — live yaml */}
-                            <div>
-                                <div className="builder-out-label">generated config</div>
-                                <div className="builder-badges">
-                                    {Object.entries(selections).map(([k, v]) => (
-                                        <span className="builder-badge" key={k}>
-                                            {k}: <strong>{v}</strong>
-                                        </span>
-                                    ))}
-                                </div>
-                                <div className="builder-yaml">
-                                    <pre>{yaml}</pre>
-                                </div>
-                                <button className="builder-download" onClick={downloadYaml}>
-                                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"
-                                        stroke="currentColor" strokeWidth="1.6"
-                                        strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M8 2v8m0 0L5 7m3 3 3-3M2 13h12" />
-                                    </svg>
-                                    download rag.yaml
-                                </button>
-                            </div>
-
-                        </div>
-                    </div>
+                <div className="hero-install">
+                  <span>install</span>
+                  <code>pip install ragway</code>
                 </div>
+              </div>
 
-                {/* ── FAQ ── */}
-                <div className="container">
-                    <div className="section">
-                        <div className="section-eyebrow">faq</div>
-                        <h2 className="section-h2">Common questions</h2>
-                        {FAQS.map((item, i) => (
-                            <div className="faq-item" key={i}>
-                                <div className="faq-q" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
-                                    <span>{item.q}</span>
-                                    <span className={`faq-icon${openFaq === i ? ' open' : ''}`}>+</span>
-                                </div>
-                                {openFaq === i && <div className="faq-a">{item.a}</div>}
-                            </div>
-                        ))}
-                    </div>
+              {/* right — code editor */}
+              <div className="code-editor">
+                <div className="editor-header">
+                  <div className="editor-dot" style={{ background: '#ff5f57' }} />
+                  <div className="editor-dot" style={{ background: '#febc2e' }} />
+                  <div className="editor-dot" style={{ background: '#28c840' }} />
+                  <span className="editor-file">quickstart.py</span>
                 </div>
+                <div className="editor-body">
+                  <pre dangerouslySetInnerHTML={{ __html: CODE_HTML }} />
+                </div>
+              </div>
 
-                {/* ── FOOTER ── */}
-                <footer className="footer">
-                    <div className="footer-name">ragway</div>
-                    <div className="footer-links">
-                        <a href="https://pypi.org/project/ragway/" target="_blank" rel="noreferrer">pypi</a>
-                        <a href="https://github.com/swapanth/ragway" target="_blank" rel="noreferrer">github</a>
-                        <Link href="/docs">docs</Link>
-                        <Link href="/docs/quickstart">quickstart</Link>
-                    </div>
-                </footer>
             </div>
+          </div>
+        </div>
 
-        </>
-    )
+        {/* ── HOW TO USE ── */}
+        <div className="container">
+          <div className="section">
+            <div className="section-eyebrow">how it works</div>
+            <h2 className="section-h2">One YAML file.<br />Everything configured.</h2>
+            <p className="section-lead">
+              Pick a provider for each component. Add your API key.
+              ragway wires it all together — no Python changes needed.
+            </p>
+            <div className="yaml-tabs">
+              {(Object.keys(YAML_EXAMPLES) as Array<keyof typeof YAML_EXAMPLES>).map(k => (
+                <button
+                  key={k}
+                  className={`yaml-tab${activeYaml === k ? ' active' : ''}`}
+                  onClick={() => setActiveYaml(k)}
+                >
+                  {k === 'groq' ? 'groq + qdrant' : k === 'anthropic' ? 'anthropic + pinecone' : 'fully local'}
+                </button>
+              ))}
+            </div>
+            <div className="yaml-block">
+              <pre>{YAML_EXAMPLES[activeYaml]}</pre>
+            </div>
+          </div>
+        </div>
+
+        {/* ── CONFIG BUILDER ── */}
+        <div className="container">
+          <div className="section">
+            <div className="section-eyebrow">config builder</div>
+            <h2 className="section-h2">Build your rag.yaml</h2>
+            <p className="section-lead">
+              Select one from each category. Your config generates live.
+              Download and drop it straight into your project.
+            </p>
+            <div className="builder-grid">
+
+              {/* left — chips */}
+              <div>
+                {REGISTRY_CATEGORIES.map(({ cat, label, items }) => (
+                  <div className="builder-category" key={cat}>
+                    <div className="builder-cat-label">{label}</div>
+                    <div className="builder-chips">
+                      {items.map(item => (
+                        <button
+                          key={item}
+                          className={`builder-chip${selections[cat] === item ? ' selected' : ''}`}
+                          onClick={() => select(cat as CatKey, item)}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* right — live yaml */}
+              <div>
+                <div className="builder-out-label">generated config</div>
+                <div className="builder-badges">
+                  {Object.entries(selections).map(([k, v]) => (
+                    <span className="builder-badge" key={k}>
+                      {k}: <strong>{v}</strong>
+                    </span>
+                  ))}
+                </div>
+                <div className="builder-yaml">
+                  <pre>{yaml}</pre>
+                </div>
+                <button className="builder-download" onClick={downloadYaml}>
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"
+                    stroke="currentColor" strokeWidth="1.6"
+                    strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M8 2v8m0 0L5 7m3 3 3-3M2 13h12" />
+                  </svg>
+                  download rag.yaml
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {/* ── FAQ ── */}
+        <div className="container">
+          <div className="section">
+            <div className="section-eyebrow">faq</div>
+            <h2 className="section-h2">Common questions</h2>
+            {FAQS.map((item, i) => (
+              <div className="faq-item" key={i}>
+                <div className="faq-q" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
+                  <span>{item.q}</span>
+                  <span className={`faq-icon${openFaq === i ? ' open' : ''}`}>+</span>
+                </div>
+                {openFaq === i && <div className="faq-a">{item.a}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── FOOTER ── */}
+        <footer className="footer">
+          <div className="footer-name">ragway</div>
+          <div className="footer-links">
+            <a href="https://pypi.org/project/ragway/" target="_blank" rel="noreferrer">pypi</a>
+            <a href="https://github.com/swapanth/ragway" target="_blank" rel="noreferrer">github</a>
+            <Link href="/docs">docs</Link>
+            <Link href="/docs/quickstart">quickstart</Link>
+            <a href="mailto:swapanthvakapalli@gmail.com">swapanthvakapalli@gmail.com</a>
+          </div>
+        </footer>
+      </div>
+
+    </>
+  )
 }

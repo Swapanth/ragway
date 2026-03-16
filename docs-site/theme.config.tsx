@@ -13,7 +13,7 @@ const config: DocsThemeConfig = {
     footer: {
         text: (
             <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 12 }}>
-                ragway · The way to build RAG · MIT License
+                ragway · The way to build RAG · MIT License · swapanthvakapalli@gmail.com
             </span>
         ),
     },
