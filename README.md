@@ -114,5 +114,5 @@ print(asyncio.run(rag.query("Summarize the key idea.")))
 ## Links
 
 - Docs: https://ragway.dev
-- Issues: https://github.com/yourusername/ragway/issues
-- Changelog: https://github.com/yourusername/ragway/blob/main/CHANGELOG.md
+- Issues: https://github.com/swapanth/ragway/issues
+- Changelog: https://github.com/swapanth/ragway/blob/main/CHANGELOG.md

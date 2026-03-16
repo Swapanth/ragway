@@ -54,9 +54,9 @@ dev = ["ragway[all]", "pytest", "pytest-asyncio>=0.23", "mypy", "ruff"]
 rag = "ragway.cli.rag_cli:main"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/ragway"
+Homepage = "https://github.com/swapanth/ragway"
 Documentation = "https://ragway.dev"
-Issues = "https://github.com/yourusername/ragway/issues"
+Issues = "https://github.com/swapanth/ragway/issues"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

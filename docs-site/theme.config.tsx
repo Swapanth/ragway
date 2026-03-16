@@ -4,9 +4,9 @@ import { useRouter } from 'next/router'
 const config: DocsThemeConfig = {
     logo: <span style={{ fontFamily: 'DM Mono, monospace', fontWeight: 500 }}>ragway</span>,
     project: {
-        link: 'https://github.com/yourusername/ragway',
+        link: 'https://github.com/swapanth/ragway',
     },
-    docsRepositoryBase: 'https://github.com/yourusername/ragway/tree/main/docs-site',
+    docsRepositoryBase: 'https://github.com/swapanth/ragway/tree/main/docs-site',
     navigation: true,
     darkMode: true,
     nextThemes: { defaultTheme: 'dark' },
