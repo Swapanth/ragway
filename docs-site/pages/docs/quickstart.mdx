@@ -1,0 +1,70 @@
+---
+title: Quickstart
+description: Get ragway running in 5 minutes
+---
+
+# Quickstart
+
+Get a working RAG system in under 5 minutes using free providers.
+
+## 1. Install
+
+```bash
+pip install ragway[groq,faiss,bge]
+```
+
+## 2. Get a free Groq key
+
+Sign up at [console.groq.com](https://console.groq.com) - free, no credit card.
+
+## 3. Write rag.yaml
+
+```yaml
+version: "1.0"
+pipeline: naive
+
+plugins:
+  llm:
+    provider: groq
+    model: llama-3.3-70b-versatile
+    api_key: YOUR_GROQ_KEY
+
+  embedding:
+    provider: bge
+    model: BAAI/bge-large-en-v1.5
+
+  vectorstore:
+    provider: faiss
+    index_path: .ragway/index
+
+  reranker:
+    enabled: false
+
+  chunking:
+    strategy: recursive
+    chunk_size: 512
+    overlap: 50
+```
+
+## 4. Run
+
+```python
+from ragway import RAG
+import asyncio
+
+rag = RAG.from_config("rag.yaml")
+
+async def main():
+    await rag.ingest("./my_docs/")
+    answer = await rag.query("What is in my documents?")
+    print(answer)
+
+asyncio.run(main())
+```
+
+## 5. CLI
+
+```bash
+rag ingest ./my_docs/ --config rag.yaml
+rag query "What is in my documents?" --config rag.yaml
+```

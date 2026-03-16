@@ -1,0 +1,50 @@
+# Use this for very long documents where ordered retrieval and context compression matter most.
+version: "1.0"
+pipeline: long_context
+
+plugins:
+  llm:
+    provider: anthropic
+    model: claude-opus-4-6
+    api_key: ${ANTHROPIC_API_KEY}
+    temperature: 0.1
+    max_tokens: 2048
+
+  embedding:
+    provider: openai
+    model: text-embedding-3-small
+    api_key: ${OPENAI_API_KEY}
+    batch_size: 32
+
+  vectorstore:
+    provider: weaviate
+    index_name: rag-long-doc
+    api_key: ${WEAVIATE_API_KEY}
+    top_k: 12
+
+  retrieval:
+    strategy: vector
+    top_k: 12
+    hybrid_alpha: 0.5
+
+  reranker:
+    enabled: false
+    provider: cohere
+    model: rerank-english-v3.0
+    api_key: ${COHERE_API_KEY}
+    top_k: 5
+
+  chunking:
+    strategy: hierarchical
+    chunk_size: 1024
+    overlap: 100
+
+  caching:
+    embeddings: true
+    retrieval: true
+    llm: true
+
+  observability:
+    tracing: true
+    cost_tracking: true
+    log_level: INFO

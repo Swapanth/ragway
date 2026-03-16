@@ -1,0 +1,31 @@
+---
+title: Introduction
+description: ragway - The way to build RAG
+---
+
+# ragway
+
+**The way to build RAG.** ragway is a modular Python library for
+building Retrieval-Augmented Generation pipelines. Swap any component
+via a single YAML config file - no Python code changes needed.
+
+## What makes ragway different
+
+- **One config file** - LLM, vectorstore, embeddings, reranker all in `rag.yaml`
+- **Fully modular** - swap any component with one line
+- **6 LLMs** - Anthropic, OpenAI, Mistral, Groq, Llama, Local
+- **6 vectorstores** - FAISS, Chroma, Pinecone, Weaviate, Qdrant, PGVector
+- **5 pipelines** - naive, hybrid, self-RAG, long context, agentic
+- **Free tier ready** - works with Groq + BGE + FAISS, zero cost
+
+## Quick example
+
+```python
+from ragway import RAG
+import asyncio
+
+rag = RAG.from_config("rag.yaml")
+asyncio.run(rag.ingest("./docs/"))
+answer = asyncio.run(rag.query("What is in my documents?"))
+print(answer)
+```

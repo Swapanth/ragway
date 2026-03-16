@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap');
+
+:root {
+    --font-mono: 'DM Mono', monospace;
+    --font-sans: 'DM Sans', sans-serif;
+    --accent: #38b6ff;
+    --accent-light: #e0f4ff;
+}
+
+body {
+    font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: -0.3px;
+}
+
+code,
+pre,
+kbd {
+    font-family: var(--font-mono) !important;
+}
+
+.nextra-nav-container nav a {
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+
+.hero-accent {
+    display: inline-block;
+    width: 32px;
+    height: 3px;
+    background: var(--accent);
+    margin-bottom: 1.5rem;
+    border-radius: 2px;
+}

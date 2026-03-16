@@ -1,0 +1,22 @@
+---
+title: Embedding Providers
+---
+
+# Embedding Providers
+
+| Provider | Config string | Typical use |
+|---|---|---|
+| OpenAI | `openai` | High quality hosted embeddings |
+| BGE | `bge` | Strong open models, local-friendly |
+| Cohere | `cohere` | Hosted multilingual embeddings |
+| Sentence Transformer | `sentence_transformer` | Local experimentation |
+
+Example:
+
+```yaml
+plugins:
+  embedding:
+    provider: bge
+    model: BAAI/bge-large-en-v1.5
+    batch_size: 32
+```

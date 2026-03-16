@@ -1,0 +1,20 @@
+---
+title: Vectorstores
+---
+
+# Vectorstores
+
+| Provider | Config string | Type | Free tier |
+|---|---|---|---|
+| FAISS | `faiss` | Local | Free |
+| Chroma | `chroma` | Local | Free |
+| Qdrant | `qdrant` | Both | Cloud free |
+| Pinecone | `pinecone` | Cloud | Limited |
+| Weaviate | `weaviate` | Both | Cloud free |
+| PGVector | `pgvector` | Self-hosted | Free |
+
+```bash
+pip install ragway[faiss]     # local, no setup
+pip install ragway[qdrant]    # cloud or in-memory
+pip install ragway[pinecone]  # managed cloud
+```

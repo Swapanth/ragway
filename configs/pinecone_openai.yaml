@@ -1,0 +1,50 @@
+# Use this for production-style cloud setup with Pinecone retrieval and OpenAI generation.
+version: "1.0"
+pipeline: naive
+
+plugins:
+  llm:
+    provider: openai
+    model: gpt-4o
+    api_key: ${OPENAI_API_KEY}
+    temperature: 0.2
+    max_tokens: 1024
+
+  embedding:
+    provider: openai
+    model: text-embedding-3-small
+    api_key: ${OPENAI_API_KEY}
+    batch_size: 32
+
+  vectorstore:
+    provider: pinecone
+    index_name: rag-pinecone-openai
+    api_key: ${PINECONE_API_KEY}
+    top_k: 5
+
+  retrieval:
+    strategy: vector
+    top_k: 5
+    hybrid_alpha: 0.5
+
+  reranker:
+    enabled: false
+    provider: cohere
+    model: rerank-english-v3.0
+    api_key: ${COHERE_API_KEY}
+    top_k: 3
+
+  chunking:
+    strategy: recursive
+    chunk_size: 512
+    overlap: 50
+
+  caching:
+    embeddings: true
+    retrieval: true
+    llm: true
+
+  observability:
+    tracing: true
+    cost_tracking: true
+    log_level: INFO

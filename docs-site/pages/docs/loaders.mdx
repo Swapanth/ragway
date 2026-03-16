@@ -1,0 +1,36 @@
+---
+title: Document Loaders
+description: Supported ingestion sources
+---
+
+# Document Loaders
+
+ragway supports ingestion from common local and remote sources.
+
+## Supported types
+
+- PDF
+- Markdown
+- DOCX
+- Excel
+- HTML
+- Plain text
+- Web URLs
+- YouTube transcripts
+- Notion pages
+
+## Example
+
+```python
+from ragway import RAG
+import asyncio
+
+rag = RAG.from_config("rag.yaml")
+
+async def main() -> None:
+    await rag.ingest("./data/docs/")
+
+asyncio.run(main())
+```
+
+For mixed sources, run ingestion multiple times or point to a directory containing all files.

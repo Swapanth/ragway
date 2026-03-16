@@ -1,0 +1,45 @@
+# Use this for local-only experiments with no cloud API keys: FAISS + BGE embeddings + local LLaMA adapter.
+version: "1.0"
+pipeline: naive
+
+plugins:
+  llm:
+    provider: llama
+    model: llama-3.1-8b-instruct
+    temperature: 0.2
+    max_tokens: 768
+
+  embedding:
+    provider: bge
+    model: bge-small-en-v1.5
+    batch_size: 64
+
+  vectorstore:
+    provider: faiss
+    index_name: rag-fully-local
+    top_k: 5
+
+  retrieval:
+    strategy: vector
+    top_k: 5
+    hybrid_alpha: 0.5
+
+  reranker:
+    enabled: false
+    provider: bge
+    top_k: 3
+
+  chunking:
+    strategy: fixed
+    chunk_size: 512
+    overlap: 50
+
+  caching:
+    embeddings: true
+    retrieval: true
+    llm: true
+
+  observability:
+    tracing: true
+    cost_tracking: false
+    log_level: INFO

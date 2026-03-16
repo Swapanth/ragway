@@ -1,0 +1,65 @@
+---
+title: Pipelines
+description: Five RAG pipeline variants
+---
+
+# Pipelines
+
+ragway includes five pipeline variants. Set `pipeline:` in `rag.yaml`.
+
+## naive
+
+The simplest pipeline. Embeds query -> retrieves chunks -> generates answer.
+Best starting point. Fastest. Lowest cost.
+
+```yaml
+pipeline: naive
+```
+
+## hybrid
+
+Combines BM25 keyword search with vector search using Reciprocal Rank Fusion.
+Better for queries with specific terms, names, IDs, or technical keywords.
+
+```yaml
+pipeline: hybrid
+plugins:
+  retrieval:
+    strategy: hybrid
+    hybrid_alpha: 0.5  # 0 = pure BM25, 1 = pure vector
+```
+
+## self
+
+Self-correcting pipeline. The LLM grades its own retrieved context and
+generated answer. Retries if context is irrelevant or answer is unfaithful.
+
+```yaml
+pipeline: self
+```
+
+Returns: `{ answer, hallucination_score, retries_used }`
+
+## long_context
+
+Retrieves 20+ chunks, sorts by document position, feeds in order to a
+long-context model. Best for summarization and questions spanning whole documents.
+
+```yaml
+pipeline: long_context
+plugins:
+  llm:
+    provider: anthropic
+    model: claude-opus-4-6  # needs large context window
+```
+
+## agentic
+
+LLM uses tools (retrieval, web search, calculator) and loops until it
+has enough information. Best for multi-step questions.
+
+```yaml
+pipeline: agentic
+```
+
+Returns: `{ answer, tool_calls_made, iterations_used }`

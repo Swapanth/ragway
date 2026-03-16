@@ -1,0 +1,34 @@
+---
+title: Installation
+description: Install ragway and optional providers
+---
+
+# Installation
+
+Install ragway with only the integrations you need.
+
+## Base install
+
+```bash
+pip install ragway
+```
+
+## Provider extras
+
+```bash
+pip install ragway[groq,faiss,bge]
+pip install ragway[anthropic,pinecone]
+pip install ragway[openai,weaviate]
+```
+
+## Verify
+
+```bash
+python -c "import ragway; print('ragway installed')"
+```
+
+## Next steps
+
+- Create your `rag.yaml` file.
+- Add provider API keys with environment variables.
+- Run `rag ingest` then `rag query`.

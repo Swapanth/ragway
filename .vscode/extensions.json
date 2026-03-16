@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    // ── Required ──────────────────────────────────────────────────────────────
+    "github.copilot",                  // Copilot core
+    "github.copilot-chat",             // Copilot chat + agent mode
+
+    // ── Python tooling ────────────────────────────────────────────────────────
+    "ms-python.python",                // Python language support
+    "ms-python.vscode-pylance",        // Pylance type checking
+    "charliermarsh.ruff",              // Ruff linter + formatter
+    "ms-python.mypy-type-checker",     // Mypy strict type checking
+
+    // ── Testing ───────────────────────────────────────────────────────────────
+    "ms-python.python",                // pytest test runner built in
+
+    // ── Docs ─────────────────────────────────────────────────────────────────
+    "yzhang.markdown-all-in-one",      // preview CLAUDE.md / architecture.md
+    "bierner.markdown-mermaid"         // render mermaid diagrams in docs
+  ]
+}

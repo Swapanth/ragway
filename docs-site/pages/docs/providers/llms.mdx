@@ -1,0 +1,22 @@
+---
+title: LLM Providers
+---
+
+# LLM Providers
+
+| Provider | Config string | Default model | Free tier |
+|---|---|---|---|
+| Anthropic | `anthropic` | claude-sonnet-4-6 | No |
+| OpenAI | `openai` | gpt-4o | No |
+| Mistral | `mistral` | mistral-large-latest | Trial |
+| Groq | `groq` | llama-3.3-70b-versatile | Yes |
+| Llama (local) | `llama` | llama-3.1-8b-instruct | Free |
+| Local/Ollama | `local` | any Ollama model | Free |
+
+Install only what you need:
+
+```bash
+pip install ragway[anthropic]   # Anthropic only
+pip install ragway[groq]        # Groq only
+pip install ragway[mistral]     # Mistral only
+```

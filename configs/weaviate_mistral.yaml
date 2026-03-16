@@ -1,0 +1,50 @@
+# Use this when you want hybrid retrieval on Weaviate with Mistral generation and reranking.
+version: "1.0"
+pipeline: hybrid
+
+plugins:
+  llm:
+    provider: mistral
+    model: mistral-large-latest
+    api_key: ${MISTRAL_API_KEY}
+    temperature: 0.2
+    max_tokens: 1024
+
+  embedding:
+    provider: openai
+    model: text-embedding-3-small
+    api_key: ${OPENAI_API_KEY}
+    batch_size: 32
+
+  vectorstore:
+    provider: weaviate
+    index_name: rag-weaviate-mistral
+    api_key: ${WEAVIATE_API_KEY}
+    top_k: 6
+
+  retrieval:
+    strategy: hybrid
+    top_k: 6
+    hybrid_alpha: 0.5
+
+  reranker:
+    enabled: true
+    provider: cohere
+    model: rerank-english-v3.0
+    api_key: ${COHERE_API_KEY}
+    top_k: 4
+
+  chunking:
+    strategy: recursive
+    chunk_size: 640
+    overlap: 64
+
+  caching:
+    embeddings: true
+    retrieval: true
+    llm: true
+
+  observability:
+    tracing: true
+    cost_tracking: true
+    log_level: INFO

@@ -1,0 +1,23 @@
+---
+title: Rerankers
+---
+
+# Rerankers
+
+| Provider | Config string | Notes |
+|---|---|---|
+| Cohere | `cohere` | Hosted reranking API |
+| BGE | `bge` | Open model reranker |
+| Cross Encoder | `cross_encoder` | Local cross-encoder reranking |
+
+Example:
+
+```yaml
+plugins:
+  reranker:
+    enabled: true
+    provider: cohere
+    model: rerank-english-v3.0
+    api_key: ${COHERE_API_KEY}
+    top_k: 3
+```

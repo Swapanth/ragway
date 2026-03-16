@@ -1,0 +1,6 @@
+{
+    "llms": "LLMs",
+    "vectorstores": "Vectorstores",
+    "embeddings": "Embeddings",
+    "rerankers": "Rerankers"
+}

@@ -1,0 +1,52 @@
+---
+title: Examples
+description: Practical ragway configurations
+---
+
+# Examples
+
+## Fully local setup
+
+```yaml
+pipeline: naive
+plugins:
+  llm:
+    provider: llama
+    model_path: ./models/llama-3.1-8b.gguf
+  embedding:
+    provider: bge
+    model: BAAI/bge-large-en-v1.5
+  vectorstore:
+    provider: faiss
+    index_path: .ragway/index
+```
+
+## Hybrid cloud setup
+
+```yaml
+pipeline: hybrid
+plugins:
+  llm:
+    provider: groq
+    model: llama-3.3-70b-versatile
+    api_key: ${GROQ_API_KEY}
+  embedding:
+    provider: openai
+    model: text-embedding-3-small
+    api_key: ${OPENAI_API_KEY}
+  vectorstore:
+    provider: qdrant
+  retrieval:
+    strategy: hybrid
+    hybrid_alpha: 0.5
+```
+
+## Long context summarization
+
+```yaml
+pipeline: long_context
+plugins:
+  llm:
+    provider: anthropic
+    model: claude-opus-4-6
+```

@@ -1,0 +1,31 @@
+---
+title: CLI Reference
+description: ragway command line interface
+---
+
+# CLI Reference
+
+ragway ships with a CLI installed automatically with pip.
+
+## Commands
+
+```bash
+# Ingest documents
+rag ingest ./docs/ --config rag.yaml
+
+# Query
+rag query "What is RAG?" --config rag.yaml
+
+# Evaluate against a dataset
+rag evaluate --dataset eval.json --config rag.yaml
+
+# Benchmark all pipelines
+rag benchmark --config rag.yaml
+```
+
+## Global options
+
+```bash
+rag --help
+rag query --help
+```

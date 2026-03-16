@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ragway"
+version = "0.1.0"
+description = "The way to build RAG — modular, configurable, plugin-based"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = ["rag", "llm", "retrieval", "embeddings", "ai", "ragway"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "pydantic>=2.0",
+  "pyyaml>=6.0",
+  "python-dotenv>=1.0",
+  "numpy>=1.24",
+  "aiohttp>=3.9",
+  "click>=8.1",
+]
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.25"]
+openai = ["openai>=1.0"]
+mistral = ["openai>=1.0"]
+groq = ["openai>=1.0"]
+vertex-ai = ["google-cloud-aiplatform>=1.70"]
+azure-openai = ["openai>=1.0"]
+bedrock = ["boto3>=1.34"]
+cohere = ["cohere>=5.0"]
+pinecone = ["pinecone-client>=3.0"]
+weaviate = ["weaviate-client>=4.0"]
+qdrant = ["qdrant-client>=1.9"]
+pgvector = ["pgvector>=0.3", "asyncpg>=0.30"]
+faiss = ["faiss-cpu>=1.7"]
+chroma = ["chromadb>=0.4"]
+llama = ["llama-cpp-python>=0.2"]
+bge = ["sentence-transformers>=2.2"]
+docx = ["python-docx>=1.1"]
+excel = ["openpyxl>=3.1"]
+youtube = ["youtube-transcript-api>=0.6"]
+notion = ["aiohttp>=3.9"]
+all-cloud = ["ragway[anthropic,openai,cohere,pinecone]"]
+all-local = ["ragway[faiss,bge,llama]"]
+all = ["ragway[anthropic,openai,mistral,groq,vertex-ai,azure-openai,bedrock,cohere,pinecone,weaviate,qdrant,pgvector,faiss,chroma,bge,llama,docx,excel,youtube,notion]"]
+dev = ["ragway[all]", "pytest", "pytest-asyncio>=0.23", "mypy", "ruff"]
+
+[project.scripts]
+rag = "ragway.cli.rag_cli:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/ragway"
+Documentation = "https://ragway.dev"
+Issues = "https://github.com/yourusername/ragway/issues"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+  "integration: marks tests that require real API keys",
+]

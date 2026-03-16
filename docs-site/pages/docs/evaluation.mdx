@@ -1,0 +1,33 @@
+---
+title: Evaluation
+description: Measure quality, faithfulness, and latency
+---
+
+# Evaluation
+
+ragway includes built-in evaluation modules to benchmark pipeline quality.
+
+## Metrics
+
+- Faithfulness
+- Answer accuracy
+- Context recall
+- Context precision
+- Hallucination score
+- Latency
+
+## CLI evaluation
+
+```bash
+rag evaluate --dataset eval.json --config rag.yaml
+```
+
+## Programmatic evaluation
+
+```python
+from ragway.evaluation.faithfulness import FaithfulnessEval
+
+# Evaluate generated answer and retrieved context against a question.
+```
+
+Use the same dataset across pipeline variants to compare quality and cost trade-offs.

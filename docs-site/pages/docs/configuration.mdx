@@ -1,0 +1,75 @@
+---
+title: Configuration
+description: Full rag.yaml reference
+---
+
+# Configuration
+
+All ragway behavior is controlled by a single `rag.yaml` file.
+
+## Full reference
+
+```yaml
+version: "1.0"
+
+# Pipeline type
+pipeline: naive   # naive | hybrid | self | long_context | agentic
+
+plugins:
+
+  # LLM - the model that generates answers
+  llm:
+    provider: anthropic           # anthropic | openai | mistral | groq | llama | local
+    model: claude-sonnet-4-6
+    api_key: ${ANTHROPIC_API_KEY} # or hardcode directly
+    temperature: 0.2
+    max_tokens: 1024
+
+  # Embeddings - converts text to vectors
+  embedding:
+    provider: openai              # openai | bge | cohere | sentence_transformer
+    model: text-embedding-3-small
+    api_key: ${OPENAI_API_KEY}
+    batch_size: 32
+
+  # Vectorstore - stores and searches vectors
+  vectorstore:
+    provider: faiss               # faiss | chroma | pinecone | weaviate | qdrant | pgvector
+    index_path: .ragway/index
+
+  # Retrieval strategy
+  retrieval:
+    strategy: vector              # vector | bm25 | hybrid | multi_query | parent_document
+    top_k: 5
+    hybrid_alpha: 0.5             # hybrid only: 0=bm25, 1=vector
+
+  # Reranker - improves result ordering
+  reranker:
+    enabled: true
+    provider: cohere              # cohere | bge | cross_encoder
+    model: rerank-english-v3.0
+    api_key: ${COHERE_API_KEY}
+    top_k: 3
+
+  # Chunking - splits documents into pieces
+  chunking:
+    strategy: recursive           # fixed | recursive | semantic | sliding_window | hierarchical
+    chunk_size: 512
+    overlap: 50
+```
+
+## Environment variable substitution
+
+Use `${VAR_NAME}` to reference environment variables:
+
+```yaml
+  llm:
+    provider: anthropic
+    api_key: ${ANTHROPIC_API_KEY}  # reads from environment
+```
+
+Set the variable before running:
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+```
