@@ -11,22 +11,11 @@ const config: DocsThemeConfig = {
     darkMode: true,
     nextThemes: { defaultTheme: 'dark' },
     footer: {
-        text: (
+        content: (
             <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 12 }}>
                 ragway · The way to build RAG · MIT License · swapanthvakapalli@gmail.com
             </span>
         ),
-    },
-    primaryHue: 200,
-    primarySaturation: 88,
-    useNextSeoProps() {
-        return {
-            titleTemplate: '%s · ragway',
-            description: 'The way to build RAG — modular, configurable, plugin-based.',
-            openGraph: {
-                images: [{ url: '/og.png' }],
-            },
-        }
     },
     head: function Head() {
         const router = useRouter()
@@ -46,11 +35,11 @@ const config: DocsThemeConfig = {
         toggleButton: true,
     },
     toc: { float: true },
-    editLink: { text: 'Edit this page on GitHub →' },
+    editLink: { content: 'Edit this page on GitHub →' },
     feedback: { content: null },
     banner: {
         key: 'v0.1.0',
-        text: (
+        content: (
             <span>
                 ragway v0.1.0 is live on PyPI →{' '}
                 <code
